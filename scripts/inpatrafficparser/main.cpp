@@ -4,8 +4,11 @@
 #include <QByteArray>
 #include <QDateTime>
 #include <QString>
+#include <QVector>
 #include <QDebug>
 #include <QFile>
+#include <QPair>
+#include <QSet>
 
 class Exception : public std::exception
 {
@@ -124,23 +127,15 @@ private:
   DS2Message m_response;
 };
 
-int
-main(int argc, char *argv[])
+
+using Message = QPair< qint64, DS2Message >;
+using Messages = QVector< QPair< qint64, DS2Message > >;
+
+Messages parseFile(const QString &filename)
 {
-  QCoreApplication a(argc, argv);
-
-  if (argc != 2)
-    {
-      qDebug() << QString("USAGE: %1 input.txt").arg(a.arguments().first());
-      return 1;
-    }
-
-  QFile file(a.arguments().last());
+  QFile file(filename);
   if (!file.open(QFile::ReadOnly))
-    {
-      qDebug() << file.fileName() << file.errorString();
-      return 2;
-    }
+    throw Exception(file.errorString());
 
   //  EXAMPLE INPUT:
 
@@ -154,6 +149,7 @@ main(int argc, char *argv[])
   QTextStream stream(&file);
   QRegularExpression header("[0-9]+: ([0-9]+.[0-9]+.[0-9]+ [0-9]+.[0-9]+.[0-9]+).*");
 
+  Messages messages;
   Data data;
 
   do
@@ -168,7 +164,17 @@ main(int argc, char *argv[])
           if (data.timestamp() != 0)
             {
               data.finish();
-              qDebug() << data.timestamp() << data.request().data.toHex() << data.response().data.toHex();
+
+              // filter for the proper sensor data
+              // status (response first byte)
+              // a0 -> ack
+              // a1 -> ecu busy
+              // ff -> bad command
+              if (data.request().data == QByteArray::fromHex("0b03") &&
+                  data.response().data.startsWith('\xa0'))
+                {
+                  messages << Message{ data.timestamp(), data.response() };
+                }
             }
 
           data.setTimestamp(QDateTime::fromString(match.captured(1), "yyyy-MM-dd HH:mm:ss").toSecsSinceEpoch());
@@ -179,6 +185,73 @@ main(int argc, char *argv[])
         }
     }
   while (!stream.atEnd());
+
+  return messages;
+}
+
+using Timestamps = QSet< qint64 >;
+
+Timestamps parseTimestamps(const QString &filename)
+{
+  Timestamps timestamps;
+
+  QFile file(filename);
+  if (!file.open(QFile::ReadOnly))
+    throw Exception(file.errorString());
+
+  QTextStream stream(&file);
+  do
+    {
+      QStringList columns = stream.readLine().split(",");
+      if (columns.size() != 2)
+        continue;
+
+      bool ok;
+      qint64 timestamp = columns.first().toLongLong(&ok);
+      if (!ok)
+        continue;
+
+      timestamps << timestamp;
+    }
+  while (!stream.atEnd());
+
+  return timestamps;
+}
+
+int
+main(int argc, char *argv[])
+{
+  QCoreApplication a(argc, argv);
+
+  if (argc != 3)
+    {
+      qDebug() << QString("USAGE: %1 input.txt timestamps.csv").arg(a.arguments().first());
+      return 1;
+    }
+
+
+  Timestamps timestamps = parseTimestamps(a.arguments()[2]);
+  qDebug() << timestamps.size();
+
+  Messages messages = parseFile(a.arguments()[1]);
+  qDebug() << messages.size();
+
+
+  QTextStream stream(stdout);
+  foreach (const Message &message, messages)
+    {
+      if (!timestamps.contains(message.first))
+        continue;
+
+      timestamps.remove(message.first);
+
+      stream << message.first;
+      for (int i = 0; i < message.second.data.size(); ++i)
+        {
+          stream << "," << static_cast< quint8 >(message.second.data[i]);
+        }
+      stream << endl;
+    }
 
   return 0;
 }
