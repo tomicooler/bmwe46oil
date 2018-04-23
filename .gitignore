@@ -1,0 +1,4 @@
+*-Debug/*
+*-Release/*
+scripts/*-Debug/*
+scripts/*-Release/*

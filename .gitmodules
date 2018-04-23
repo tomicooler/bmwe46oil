@@ -1,0 +1,3 @@
+[submodule "app/vendor/quickflux"]
+	path = app/vendor/quickflux
+	url = https://github.com/benlau/quickflux.git
