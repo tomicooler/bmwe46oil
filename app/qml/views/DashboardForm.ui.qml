@@ -87,7 +87,7 @@ Page {
         Label {
             id: github
             Layout.fillWidth: true
-            text: qsTr("This is an open source project - <a href=\"http://www.github.com/tomicooler\">GitHub</a> - feel free to contribute.")
+            text: qsTr("This is an open source project - <a href=\"https://github.com/tomicooler/bmwe46oil\">GitHub</a> - feel free to contribute.")
             wrapMode: Label.Wrap
             horizontalAlignment: Text.AlignHCenter
         }
