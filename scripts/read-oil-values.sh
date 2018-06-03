@@ -4,7 +4,7 @@ echo "timestamp,temperature" > data.csv
 
 for f in *.png
 do
-    magick convert $f -crop 50x24+1137+488 /tmp/cropped-$f
+    magick convert $f -crop 70x24+447+232 /tmp/cropped-$f
     tesseract /tmp/cropped-$f /tmp/ocred nobatch digits quiet
 
     datetime=${f%.*}

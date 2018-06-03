@@ -170,9 +170,10 @@ Messages parseFile(const QString &filename)
               // a0 -> ack
               // a1 -> ecu busy
               // ff -> bad command
-              if (data.request().data == QByteArray::fromHex("0b03") &&
+              if (data.request().data == QByteArray::fromHex("1b01") &&
                   data.response().data.startsWith('\xa0'))
                 {
+                  qDebug() << qPrintable(QByteArray((const char*)&data.request().ecu, 1).toHex()) << qPrintable(data.request().data.toHex()) << qPrintable(data.response().data.toHex());
                   messages << Message{ data.timestamp(), data.response() };
                 }
             }
@@ -203,7 +204,7 @@ Timestamps parseTimestamps(const QString &filename)
   do
     {
       QStringList columns = stream.readLine().split(",");
-      if (columns.size() != 2)
+      if (columns.size() < 2)
         continue;
 
       bool ok;
