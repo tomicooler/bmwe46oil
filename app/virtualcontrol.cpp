@@ -25,25 +25,49 @@ VirtualControl::~VirtualControl()
 void
 VirtualControl::pressUp()
 {
-  writeCommand("up");
+  writeCommand("p_up");
 }
 
 void
 VirtualControl::pressDown()
 {
-  writeCommand("down");
+  writeCommand("p_down");
 }
 
 void
 VirtualControl::pressLeft()
 {
-  writeCommand("left");
+  writeCommand("p_left");
 }
 
 void
 VirtualControl::pressRight()
 {
-  writeCommand("right");
+  writeCommand("p_right");
+}
+
+void
+VirtualControl::releaseUp()
+{
+  writeCommand("r_up");
+}
+
+void
+VirtualControl::releaseDown()
+{
+  writeCommand("r_down");
+}
+
+void
+VirtualControl::releaseLeft()
+{
+  writeCommand("r_left");
+}
+
+void
+VirtualControl::releaseRight()
+{
+  writeCommand("r_right");
 }
 
 void

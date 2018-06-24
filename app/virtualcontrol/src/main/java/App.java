@@ -79,6 +79,14 @@ public class App {
                     case "down": pressRelease(KeyEvent.VK_DOWN); break;
                     case "left": pressRelease(KeyEvent.VK_LEFT); break;
                     case "right": pressRelease(KeyEvent.VK_RIGHT); break;
+                    case "p_up": press(KeyEvent.VK_UP); break;
+                    case "p_down": press(KeyEvent.VK_DOWN); break;
+                    case "p_left": press(KeyEvent.VK_LEFT); break;
+                    case "p_right": press(KeyEvent.VK_RIGHT); break;
+                    case "r_up": release(KeyEvent.VK_UP); break;
+                    case "r_down": release(KeyEvent.VK_DOWN); break;
+                    case "r_left": release(KeyEvent.VK_LEFT); break;
+                    case "r_right": release(KeyEvent.VK_RIGHT); break;
                 }
             }
         } catch (Exception e) {

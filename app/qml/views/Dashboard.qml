@@ -6,26 +6,6 @@ import com.tomi.bmwe46oil 1.0
 DashboardForm {
     property Facade facade
 
-    Timer {
-        interval: 25
-        running: true
-        repeat: true
-        onTriggered: {
-            if (buttonDown.checked) {
-                facade.control.pressDown();
-            }
-            if (buttonUp.checked) {
-                facade.control.pressUp();
-            }
-            if (buttonLeft.checked) {
-                facade.control.pressLeft();
-            }
-            if (buttonRight.checked) {
-                facade.control.pressRight();
-            }
-        }
-    }
-
     property color backgroundColor: Material.color(Material.Grey, Material.Shade900)
     property color indicatorColor: Material.color(Material.Red)
 
@@ -44,5 +24,21 @@ DashboardForm {
         } else {
             facade.stop();
         }
+    }
+
+    buttonDown.onCheckedChanged: {
+        if (buttonDown.checked) facade.control.pressDown(); else facade.control.releaseDown();
+    }
+
+    buttonUp.onCheckedChanged: {
+        if (buttonUp.checked) facade.control.pressUp(); else facade.control.releaseUp();
+    }
+
+    buttonLeft.onCheckedChanged: {
+        if (buttonLeft.checked) facade.control.pressLeft(); else facade.control.releaseLeft();
+    }
+
+    buttonRight.onCheckedChanged: {
+        if (buttonRight.checked) facade.control.pressRight(); else facade.control.releaseRight();
     }
 }

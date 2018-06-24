@@ -16,6 +16,10 @@ public slots:
   void pressDown();
   void pressLeft();
   void pressRight();
+  void releaseUp();
+  void releaseDown();
+  void releaseLeft();
+  void releaseRight();
 
 protected slots:
   void readyRead();
