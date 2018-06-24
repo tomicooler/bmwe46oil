@@ -18,6 +18,25 @@ DashboardForm {
     steeringWheel.backgroundColor: backgroundColor
     steeringWheel.indicatorColor: indicatorColor
 
+    clutch.position: facade.clutch ? 1 : 0
+    brake.position: facade.brake ? 1 : 0
+    throttle.position: facade.throttle.data.data / 84.0
+    steeringWheel.rotation: facade.steering.data.data * -1.0
+
+    brake.onPositionChanged: {
+        buttonDown.checked = brake.position == 1;
+    }
+
+    throttle.onPositionChanged: {
+        buttonUp.checked = throttle.position > 0.2
+    }
+
+    steeringWheel.onRotationChanged: {
+        console.log("ROTATION ", steeringWheel.rotation);
+        buttonLeft.checked = steeringWheel.rotation < -20.0 && steeringWheel.rotation > -150;
+        buttonRight.checked = steeringWheel.rotation < -200 && steeringWheel.rotation > -2860.0 && !buttonLeft.checked;
+    }
+
     powerButton.onCheckedChanged: {
         if (powerButton.checked) {
             facade.start();

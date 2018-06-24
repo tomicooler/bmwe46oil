@@ -1,7 +1,10 @@
 #include "config.h"
 
 Config::Config(QObject *parent)
-  : QObject(parent)
+  : QObject(parent),
+    m_bytepos(0),
+    m_length(1),
+    m_msb(true)
 {
 }
 

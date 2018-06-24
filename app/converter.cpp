@@ -1,7 +1,9 @@
 #include "converter.h"
 
 Converter::Converter(QObject *parent)
-  : QObject(parent)
+  : QObject(parent),
+    m_multiplier(1.0),
+    m_offset(0.0)
 {
 }
 
