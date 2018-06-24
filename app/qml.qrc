@@ -26,5 +26,9 @@
         <file>qml/icons/arrow-left.svg</file>
         <file>qml/icons/bars.svg</file>
         <file>qml/views/Common.qml</file>
+        <file>qml/views/SteeringWheel.qml</file>
+        <file>qml/views/SteeringWheelForm.ui.qml</file>
+        <file>qml/views/Pedal.qml</file>
+        <file>qml/views/PedalForm.ui.qml</file>
     </qresource>
 </RCC>

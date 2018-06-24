@@ -1,14 +1,42 @@
 import QtQuick 2.0
+import QtQml 2.11
 import QtQuick.Controls.Material 2.3
 import com.tomi.bmwe46oil 1.0
 
 DashboardForm {
-    property DataExtractor oil
     property Facade facade
 
-    oilLabel.text: oil.data.data.toFixed(2)
-    oilLabel.color: getLabelColor()
-    thermo.source: getThermoSource()
+    Timer {
+        interval: 25
+        running: true
+        repeat: true
+        onTriggered: {
+            if (buttonDown.checked) {
+                facade.control.pressDown();
+            }
+            if (buttonUp.checked) {
+                facade.control.pressUp();
+            }
+            if (buttonLeft.checked) {
+                facade.control.pressLeft();
+            }
+            if (buttonRight.checked) {
+                facade.control.pressRight();
+            }
+        }
+    }
+
+    property color backgroundColor: Material.color(Material.Grey, Material.Shade900)
+    property color indicatorColor: Material.color(Material.Red)
+
+    clutch.backgroundColor: backgroundColor
+    clutch.indicatorColor: indicatorColor
+    brake.backgroundColor: backgroundColor
+    brake.indicatorColor: indicatorColor
+    throttle.backgroundColor: backgroundColor
+    throttle.indicatorColor: indicatorColor
+    steeringWheel.backgroundColor: backgroundColor
+    steeringWheel.indicatorColor: indicatorColor
 
     powerButton.onCheckedChanged: {
         if (powerButton.checked) {
@@ -16,35 +44,5 @@ DashboardForm {
         } else {
             facade.stop();
         }
-    }
-
-    github.onLinkActivated: {
-        Qt.openUrlExternally(link);
-    }
-
-    function getLabelColor() {
-        var color;
-        if (oil.data.data <= 80) {
-            color = Material.color(Material.Blue);
-        } else if (oil.data.data <= 120) {
-            color = Material.color(Material.Green);
-        } else {
-            color = Material.color(Material.Red);
-        }
-        return color;
-    }
-
-    function getThermoSource() {
-        var source = "qrc:/qml/icons/thermometer-";
-        if (oil.data.data <= 40) {
-            source += "empty";
-        } else if (oil.data.data <= 70) {
-            source += "half";
-        } else if (oil.data.data <= 100) {
-            source += "three-quarters";
-        } else {
-            source += "full";
-        }
-        return source + ".svg";
     }
 }

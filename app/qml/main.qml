@@ -75,7 +75,6 @@ ApplicationWindow {
         id: dashboard
         Dashboard {
             facade: MainStore.facade
-            oil: MainStore.oil
             width: stackView.width
             height: stackView.height
         }

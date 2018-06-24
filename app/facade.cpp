@@ -15,6 +15,12 @@ Facade::request()
   return &m_request;
 }
 
+VirtualControl *
+Facade::control()
+{
+  return &m_control;
+}
+
 int
 Facade::updateInterval() const
 {

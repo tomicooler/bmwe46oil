@@ -23,6 +23,7 @@ main(int argc, char *argv[])
   qmlRegisterType< SerialInterface >("com.tomi.bmwe46oil", 1, 0, "SerialInterface");
 #endif
 
+  qmlRegisterType< VirtualControl >("com.tomi.bmwe46oil", 1, 0, "VirtualControl");
   qmlRegisterType< DataExtractor >("com.tomi.bmwe46oil", 1, 0, "DataExtractor");
   qmlRegisterType< TCPInterface >("com.tomi.bmwe46oil", 1, 0, "TCPInterface");
   qmlRegisterType< DS2Request >("com.tomi.bmwe46oil", 1, 0, "DS2Request");

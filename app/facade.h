@@ -15,12 +15,14 @@ class Facade : public QObject
   Q_OBJECT
 
   Q_PROPERTY(DS2Request *request READ request CONSTANT FINAL)
+  Q_PROPERTY(VirtualControl *control READ control CONSTANT FINAL)
   Q_PROPERTY(int updateInterval READ updateInterval WRITE setUpdateInterval NOTIFY updateIntervalChanged)
 
 public:
   explicit Facade(QObject *parent = nullptr);
 
   DS2Request *request();
+  VirtualControl *control();
 
   int updateInterval() const;
   Q_INVOKABLE void start();
