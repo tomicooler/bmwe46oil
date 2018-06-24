@@ -8,6 +8,7 @@
 #include <ds2request.h>
 #include <ds2parser.h>
 #include <dataextractor.h>
+#include <virtualcontrol.h>
 
 class Facade : public QObject
 {
@@ -40,6 +41,8 @@ private:
   DS2Parser m_parser;
   DS2Request m_request;
   QByteArray m_buffer;
+
+  VirtualControl m_control;
 };
 
 #endif // FACADE_H

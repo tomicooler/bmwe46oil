@@ -24,7 +24,8 @@ HEADERS += \
     ds2source.h \
     dataextractor.h \
     facade.h \
-    tcpinterface.h
+    tcpinterface.h \
+    virtualcontrol.h
 
 SOURCES += \
     main.cpp \
@@ -35,7 +36,8 @@ SOURCES += \
     ds2parser.cpp \
     dataextractor.cpp \
     facade.cpp \
-    tcpinterface.cpp
+    tcpinterface.cpp \
+    virtualcontrol.cpp
 
 !android {
 
