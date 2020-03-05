@@ -224,6 +224,9 @@ Messages parseTsharkFile(const QString &filename)
   // 1583342581.057130857	000212c02100003c0007b829f10221024170
   // 1583342581.206739591	b8f1290c6102fb66f683fbc007640000bf
 
+  // my guess: b829f1 : ecu,  02 length, data 2102, checksum 41
+  //           b8f129         0c              6102fb66f683fbc007640000     41
+
   QTextStream stream(&file);
 
   Messages messages;
