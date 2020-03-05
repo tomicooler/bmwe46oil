@@ -94,8 +94,7 @@ public:
     return m_response;
   }
 
-private:
-  DS2Message parseDS2Message(QByteArray &data) const
+  static DS2Message parseDS2Message(QByteArray &data)
   {
     // [ECU ADDRESS] [LENGTH] [DATA1] [DATAN] [CHECKSUM]
     if (data.size() < 3)
@@ -131,7 +130,7 @@ private:
 using Message = QPair< qint64, DS2Message >;
 using Messages = QVector< QPair< qint64, DS2Message > >;
 
-Messages parseFile(const QString &filename)
+Messages parseDeviceMonitoringStudioFile(const QString &filename)
 {
   QFile file(filename);
   if (!file.open(QFile::ReadOnly))
@@ -190,6 +189,55 @@ Messages parseFile(const QString &filename)
   return messages;
 }
 
+Messages parseTsharkFile(const QString &filename)
+{
+  QFile file(filename);
+  if (!file.open(QFile::ReadOnly))
+    throw Exception(file.errorString());
+
+  //  EXAMPLE INPUT:
+
+  // 000212c02100003c00[1byte: ds2 request length][lenght byte: ds2 response data][1byte: checksum simple c = 0; for b in bytes: c += b;]
+
+  // 1583342581.057130857	000212c02100003c0007b829f10221024170
+  // 1583342581.206739591	b8f1290c6102fb66f683fbc007640000bf
+
+  QTextStream stream(&file);
+
+  Messages messages;
+
+  const QChar tab('\t');
+  do
+    {
+      QString line = stream.readLine().trimmed();
+      if (line.isEmpty())
+        continue;
+
+      QStringList splitted = line.split(tab);
+
+      if (splitted.count() == 2)
+        {
+          bool ok;
+          qint64 timestamp = splitted.at(0).toDouble(&ok); // narrowing
+          if (!ok)
+            continue;
+
+          try {
+            QByteArray data = QByteArray::fromHex(splitted.at(1).toUtf8());
+            DS2Message message = Data::parseDS2Message(data);
+
+            messages.append(QPair< qint64, DS2Message >{timestamp, message});
+          }  catch (const Exception &e) {
+            if (!splitted.at(1).startsWith("000212c02100003c00"))
+              qDebug() << "error" << e.what();
+          }
+        }
+    }
+  while (!stream.atEnd());
+
+  return messages;
+}
+
 using Timestamps = QSet< qint64 >;
 
 Timestamps parseTimestamps(const QString &filename)
@@ -224,9 +272,16 @@ main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
 
-  if (argc != 3)
+  if (argc != 4)
     {
-      qDebug() << QString("USAGE: %1 input.txt timestamps.csv").arg(a.arguments().first());
+      qDebug() << QString("USAGE: %1 input.txt timestamps.csv wireshark|devicemonitoringstudio").arg(a.arguments().first());
+      qDebug() << "--- input.txt ---";
+      qDebug() << "  a) Convert the wireshark pcapng stream:";
+      qDebug() << "    input.txt: tshark -r input.pcapng -T fields -e frame.time_epoch -e data &> input.txt";
+      qDebug() << "  b) Use the Device Monitoring Studio file";
+      qDebug() << "--- timestamps.csv ---";
+      qDebug() << "  ./screenshoter.sh # run this script while recording the traffic with wireshark or device m s";
+      qDebug() << "  cd imagedirectory && CROP=\"70x24+447+232\" ./ocr-screen.sh";
       return 1;
     }
 
@@ -234,7 +289,7 @@ main(int argc, char *argv[])
   Timestamps timestamps = parseTimestamps(a.arguments()[2]);
   qDebug() << timestamps.size();
 
-  Messages messages = parseFile(a.arguments()[1]);
+  Messages messages = a.arguments()[3] == QLatin1String("devicemonitoringstudio") ? parseDeviceMonitoringStudioFile(a.arguments()[1]) : parseTsharkFile(a.arguments()[1]);
   qDebug() << messages.size();
 
 
