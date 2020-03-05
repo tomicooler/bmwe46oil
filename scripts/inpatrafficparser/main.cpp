@@ -43,6 +43,18 @@ struct DS2Message
   char       checksum  = 0;
 };
 
+bool operator==(const DS2Message &a, const DS2Message &b)
+{
+  return a.ecu == b.ecu && a.length && b.length && a.data == b.data && a.checksum == b.checksum;
+}
+
+QString toString(const DS2Message &msg)
+{
+  QByteArray data;
+  data.append(msg.ecu).append(msg.length).append(msg.data).append(msg.checksum);
+  return QString::fromLatin1(data.toHex());
+}
+
 class Data
 {
 public:
@@ -58,6 +70,16 @@ public:
   void append(const QByteArray &data)
   {
     this->input += data;
+  }
+
+  void parse_request()
+  {
+    m_request = parseDS2Message(input, true);
+  }
+
+  void parse_response()
+  {
+    m_response = parseDS2Message(input, true);
   }
 
   void finish()
@@ -94,14 +116,15 @@ public:
     return m_response;
   }
 
-  static DS2Message parseDS2Message(QByteArray &data)
+private:
+  static DS2Message parseDS2Message(QByteArray &data, bool force=false)
   {
     // [ECU ADDRESS] [LENGTH] [DATA1] [DATAN] [CHECKSUM]
     if (data.size() < 3)
       throw Exception(QString("Could not parse ds2 message - invalid (%1)").arg(QString::fromLatin1(data.toHex())));
 
-    int size = data[1];
-    if (data.size() < data[1])
+    int size = force ? data.size() : data[1]; // todo might overflow
+    if (data.size() < size)
       throw Exception(QString("Could not parse ds2 message - too small (%1)").arg(QString::fromLatin1(data.toHex())));
 
     QByteArray msg = data.mid(0, size);
@@ -127,8 +150,7 @@ private:
 };
 
 
-using Message = QPair< qint64, DS2Message >;
-using Messages = QVector< QPair< qint64, DS2Message > >;
+using Messages = QVector< Data >;
 
 Messages parseDeviceMonitoringStudioFile(const QString &filename)
 {
@@ -173,7 +195,7 @@ Messages parseDeviceMonitoringStudioFile(const QString &filename)
                   data.response().data.startsWith('\xa0'))
                 {
                   qDebug() << qPrintable(QByteArray((const char*)&data.request().ecu, 1).toHex()) << qPrintable(data.request().data.toHex()) << qPrintable(data.response().data.toHex());
-                  messages << Message{ data.timestamp(), data.response() };
+                  messages << data;
                 }
             }
 
@@ -206,6 +228,12 @@ Messages parseTsharkFile(const QString &filename)
 
   Messages messages;
 
+  Data req_resp;
+  QByteArray request_framing = QByteArray::fromHex("000212c02100003c00");
+
+  bool first = true;
+  int count = 0;
+
   const QChar tab('\t');
   do
     {
@@ -222,15 +250,30 @@ Messages parseTsharkFile(const QString &filename)
           if (!ok)
             continue;
 
-          try {
-            QByteArray data = QByteArray::fromHex(splitted.at(1).toUtf8());
-            DS2Message message = Data::parseDS2Message(data);
+          req_resp.setTimestamp(timestamp);
 
-            messages.append(QPair< qint64, DS2Message >{timestamp, message});
-          }  catch (const Exception &e) {
-            if (!splitted.at(1).startsWith("000212c02100003c00"))
-              qDebug() << "error" << e.what();
-          }
+          QByteArray data = QByteArray::fromHex(splitted.at(1).toUtf8());
+
+          const bool is_request = data.startsWith(request_framing);
+          if (first && !is_request)
+            continue;
+
+          first = false;
+
+          ++count;
+          if (is_request)
+            {
+              data = data.mid(request_framing.size() + 1);
+              data = data.left(data.size() - 1);
+              req_resp.append(data);
+              req_resp.parse_request();
+            }
+          else
+            {
+              req_resp.append(data);
+              req_resp.parse_response();
+              messages.append(req_resp);
+            }
         }
     }
   while (!stream.atEnd());
@@ -293,18 +336,24 @@ main(int argc, char *argv[])
   qDebug() << messages.size();
 
 
+  QMultiHash< qint64, DS2Message > already_on_timestamp;
+
   QTextStream stream(stdout);
-  foreach (const Message &message, messages)
+  for (const Data &data : messages)
     {
-      if (!timestamps.contains(message.first))
+      if (!timestamps.contains(data.timestamp()))
         continue;
 
-      timestamps.remove(message.first);
+      if (already_on_timestamp.values(data.timestamp()).contains(data.request()))
+        continue;
 
-      stream << message.first;
-      for (int i = 0; i < message.second.data.size(); ++i)
+      already_on_timestamp.insertMulti(data.timestamp(), data.request());
+
+      stream << toString(data.request()) << ",";
+      stream << data.timestamp();
+      for (int i = 0; i < data.response().data.size(); ++i)
         {
-          stream << "," << static_cast< quint8 >(message.second.data[i]);
+          stream << "," << static_cast< quint8 >(data.response().data[i]);
         }
       stream << endl;
     }
