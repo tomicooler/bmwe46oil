@@ -29,18 +29,10 @@ private:
 
 struct DS2Message
 {
-  explicit DS2Message(char ecu = 0, char length = 0, const QByteArray &data = {}, char checksum = 0)
-    : ecu(ecu),
-      length(length),
-      data(data),
-      checksum(checksum)
-  {
-  }
-
-  char       ecu       = 0;
-  char       length    = 0;
+  QByteArray ecu;
+  quint8     length{0};
   QByteArray data;
-  char       checksum  = 0;
+  char       checksum{'\0'};
 };
 
 bool operator==(const DS2Message &a, const DS2Message &b)
@@ -70,16 +62,6 @@ public:
   void append(const QByteArray &data)
   {
     this->input += data;
-  }
-
-  void parse_request()
-  {
-    m_request = parseDS2Message(input, true);
-  }
-
-  void parse_response()
-  {
-    m_response = parseDS2Message(input, true);
   }
 
   void finish()
@@ -117,29 +99,31 @@ public:
   }
 
 private:
-  static DS2Message parseDS2Message(QByteArray &data, bool force=false)
+  static DS2Message parseDS2Message(QByteArray &data)
   {
     // [ECU ADDRESS] [LENGTH] [DATA1] [DATAN] [CHECKSUM]
-    if (data.size() < 3)
+    quint8 ecu_size = data.startsWith(QByteArray::fromHex("b829f1")) || data.startsWith(QByteArray::fromHex("b8f129")) ? 3 : 1;
+    if (data.size() < ecu_size + 2)
       throw Exception(QString("Could not parse ds2 message - invalid (%1)").arg(QString::fromLatin1(data.toHex())));
 
-    int size = force ? data.size() : data[1]; // todo might overflow
-    if (data.size() < size)
+    quint8 data_size = static_cast< quint8 >(data.at(ecu_size));
+    if (data.size() < data_size)
       throw Exception(QString("Could not parse ds2 message - too small (%1)").arg(QString::fromLatin1(data.toHex())));
 
-    QByteArray msg = data.mid(0, size);
+    quint8 packet_size = ecu_size + data_size + static_cast<quint8>(2);
     char checksum = 0;
-    for (int i = 0; i < msg.size() - 1; ++i)
+    for (int i = 0; i < packet_size - 1; ++i)
       {
-        checksum ^= msg[i];
+        checksum ^= data.at(i);
       }
 
-    if (msg[msg.size() - 1] != checksum)
-      throw Exception(QString("Could not parse ds2 message - invalid checksum (%1)").arg(QString::fromLatin1(msg.toHex())));
+    if (data.at(packet_size - 1) != checksum)
+      throw Exception(QString("Could not parse ds2 message - invalid checksum (%1)").arg(QString::fromLatin1(data.left(packet_size).toHex())));
 
-    data.remove(0, msg.size());
+    QByteArray raw_packet = data.left(packet_size);
+    data.remove(0, raw_packet.size());
 
-    return DS2Message{ msg[0], msg[1], msg.mid(2, msg.size() - 3) , msg[msg.size() - 1] };
+    return DS2Message{ raw_packet.mid(0, ecu_size), data_size, raw_packet.mid(ecu_size + 1, data_size), raw_packet.at(raw_packet.size() - 1) };
   }
 
 private:
@@ -224,9 +208,6 @@ Messages parseTsharkFile(const QString &filename)
   // 1583342581.057130857	000212c02100003c0007b829f10221024170
   // 1583342581.206739591	b8f1290c6102fb66f683fbc007640000bf
 
-  // my guess: b829f1 : ecu,  02 length, data 2102, checksum 41
-  //           b8f129         0c              6102fb66f683fbc007640000     41
-
   QTextStream stream(&file);
 
   Messages messages;
@@ -269,12 +250,15 @@ Messages parseTsharkFile(const QString &filename)
               data = data.mid(request_framing.size() + 1);
               data = data.left(data.size() - 1);
               req_resp.append(data);
-              req_resp.parse_request();
             }
           else
             {
               req_resp.append(data);
-              req_resp.parse_response();
+            }
+
+          if ((count % 2) == 0)
+            {
+              req_resp.finish();
               messages.append(req_resp);
             }
         }
@@ -339,11 +323,12 @@ main(int argc, char *argv[])
   qDebug() << messages.size();
 
 
-  QMultiHash< qint64, DS2Message > already_on_timestamp;
 
-  QTextStream stream(stdout);
-  for (const Data &data : messages)
+  QStringList rows;
+  QMultiHash< qint64, DS2Message > already_on_timestamp;
+  for (Messages::const_reverse_iterator it = messages.rbegin(); it != messages.rend(); ++it) // reverse so latest greatest timestamp matching
     {
+      const Data &data = *it;
       if (!timestamps.contains(data.timestamp()))
         continue;
 
@@ -352,13 +337,21 @@ main(int argc, char *argv[])
 
       already_on_timestamp.insertMulti(data.timestamp(), data.request());
 
+      QString row;
+      QTextStream stream(&row);
       stream << toString(data.request()) << ",";
       stream << data.timestamp();
       for (int i = 0; i < data.response().data.size(); ++i)
         {
           stream << "," << static_cast< quint8 >(data.response().data[i]);
         }
-      stream << endl;
+      rows.prepend(row);
+    }
+
+  QTextStream stream(stdout);
+  for (const auto &row : rows)
+    {
+      stream << row << '\n';
     }
 
   return 0;
