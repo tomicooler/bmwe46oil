@@ -106,11 +106,17 @@ private:
     if (data.size() < ecu_size + 2)
       throw Exception(QString("Could not parse ds2 message - invalid (%1)").arg(QString::fromLatin1(data.toHex())));
 
-    quint8 data_size = static_cast< quint8 >(data.at(ecu_size));
+    quint8 packet_size = data.at(ecu_size);
+    quint8 data_size = packet_size - ecu_size - 1;
+
+    if (ecu_size > 1) {
+        data_size = data[ecu_size];
+        packet_size = ecu_size + data_size + 2;
+    }
+
     if (data.size() < data_size)
       throw Exception(QString("Could not parse ds2 message - too small (%1)").arg(QString::fromLatin1(data.toHex())));
 
-    quint8 packet_size = ecu_size + data_size + static_cast<quint8>(2);
     char checksum = 0;
     for (int i = 0; i < packet_size - 1; ++i)
       {
@@ -123,7 +129,12 @@ private:
     QByteArray raw_packet = data.left(packet_size);
     data.remove(0, raw_packet.size());
 
-    return DS2Message{ raw_packet.mid(0, ecu_size), data_size, raw_packet.mid(ecu_size + 1, data_size), raw_packet.at(raw_packet.size() - 1) };
+    return DS2Message{
+          raw_packet.mid(0, ecu_size),
+          ecu_size == 1 ? packet_size : data_size,
+          raw_packet.mid(ecu_size + 1, data_size),
+          raw_packet.at(raw_packet.size() - 1)
+    };
   }
 
 private:
