@@ -29,14 +29,14 @@ Server::handleReadyRead()
   const QByteArray request = buffer.mid(header.size(), buffer.size() - header.size() - 1);
 
   static const QByteArray oil = QByteArray::fromHex("12050b031f");
-  static const QByteArray dsc = QByteArray::fromHex("b829f102210645");
+  static const QByteArray dsc = QByteArray::fromHex("b829f1032201f5b5");
 
   if (request == oil) {
     qDebug() << "sending oil response";
     socket->write(QByteArray::fromHex("122da002c30000000038003899bbb5a7c80188fc4e64359c79887c2f7c55fefefefe1447097605050d2e9086c2"));
   } else if (request == dsc) {
     qDebug() << "sending dsc response";
-    socket->write(QByteArray::fromHex("b8f1290c6102fb67f683fbc007640000be"));
+    socket->write(QByteArray::fromHex("b8f1290c6201f5010110dd8180810000b7"));
   } else {
     qDebug() << "nem irtam!";
   }
