@@ -33,10 +33,11 @@ Server::handleReadyRead()
 
   if (request == oil) {
     qDebug() << "sending oil response";
-    socket->write(QByteArray::fromHex("122da002c30000000038003899bbb5a7c80188fc4e64359c79887c2f7c55fefefefe1447097605050d2e9086c2"));
+    socket->write(QByteArray::fromHex("122da002c30000000038003899bbb5a7c80188fc4e64359c79887c2f7c55fefefefe1447097605050d2e9086c2")); // oil temp 96.08
   } else if (request == dsc) {
     qDebug() << "sending dsc response";
-    socket->write(QByteArray::fromHex("b8f1290c6201f5010110dd8180810000b7"));
+    //socket->write(QByteArray::fromHex("b8f1290c6201f5010110dd8180810000b7"));  // angle 184.365
+    socket->write(QByteArray::fromHex("b8f1290c6201f501728000008091000018")); // -5.13
   } else {
     qDebug() << "nem irtam!";
   }
