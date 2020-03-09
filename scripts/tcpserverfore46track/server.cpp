@@ -43,12 +43,13 @@ Server::handleReadyRead()
     socket->write(QByteArray::fromHex("122da002c30000000038003899bbb5a7c80188fc4e64359c79887c2f7c55fefefefe1447097605050d2e9086c2")); // oil temp 87.377
   } else if (request == dsc_steering) {
     qDebug() << "sending dsc steering wheel response";
-    //socket->write(QByteArray::fromHex("b8f1290c6201f5010110dd8180810000b7"));  // angle 184.365
-    socket->write(QByteArray::fromHex("b8f1290c6201f501728000008091000018")); // -5.13
+    socket->write(QByteArray::fromHex("b8f1290c6201f5010110dd8180810000b7"));  // angle 184.365
+    //socket->write(QByteArray::fromHex("b8f1290c6201f501728000008091000018")); // -5.13
   } else if (request == dsc_brake) {
     qDebug() << "sending dsc brake response";
-    socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dc228122acfe46fff8126f")); // 88.329880
+    //socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dc228122acfe46fff8126f")); // 88.33
     //socket->write(QByteArray::fromHex("b8f1290f61061800c6dcffa5ff65fe46000c126c")); // 0.0
+    socket->write(QByteArray::fromHex("b8f1290f6106ff00c5dc0336030bfe460004137c")); // 8.22
   }
   else {
     qDebug() << "nem irtam!";
