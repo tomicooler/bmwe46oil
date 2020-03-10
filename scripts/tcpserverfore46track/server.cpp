@@ -40,9 +40,11 @@ Server::handleReadyRead()
   static const QByteArray motronic_m3_throttle = QByteArray::fromHex("12050b031f");
 
   if (request == motronic_m3_throttle) {
-    qDebug() << "sending oil response";
-    //socket->write(QByteArray::fromHex("1227a0000003b600000000000069858b65073a7b8181a60008000440043303e803f603e8635c73")); // throttle 100
-    socket->write(QByteArray::fromHex("1227a0000003b600000000000069858b65073a7c8181a600080001e201dd0223022f0223635ce0")); // throttle 54.7
+    qDebug() << "sending motronic ecu response";
+    //socket->write(QByteArray::fromHex("1227a0000003b600000000000069858b65073a7b8181a60008000440043303e803f603e8635c73")); // DKP 100
+    //socket->write(QByteArray::fromHex("1227a0000003b600000000000069858b65073a7c8181a600080001e201dd0223022f0223635ce0")); // DKP 54.7
+    //socket->write(QByteArray::fromHex("1227a0035d03660054043d00df66828b660a3a898181a6003600000000000000000000005d5b3a")); // RPM 861
+    socket->write(QByteArray::fromHex("1227a00ceb036600b1024d007966808c6a0e3a888181a600810000000000000100000000635c35")); // RPM 3307
   } else if (request == dsc_steering) {
     qDebug() << "sending dsc steering wheel response";
     socket->write(QByteArray::fromHex("b8f1290c6201f5010110dd8180810000b7"));  // angle 184.365
