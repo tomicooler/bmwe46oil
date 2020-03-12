@@ -54,6 +54,9 @@ Server::handleReadyRead()
     //socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dc228122acfe46fff8126f")); // 88.33
     //socket->write(QByteArray::fromHex("b8f1290f61061800c6dcffa5ff65fe46000c126c")); // 0.0
     socket->write(QByteArray::fromHex("b8f1290f6106ff00c5dc0336030bfe460004137c")); // 8.22
+  } else if (request == dsc_offsets) {
+    qDebug() << "sending dsc offsets response";
+    socket->write(QByteArray::fromHex("b8f1290c6102fb62f680fbc007640000b8"));
   }
   else {
     qDebug() << "nem irtam!";
