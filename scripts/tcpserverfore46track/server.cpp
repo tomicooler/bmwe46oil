@@ -51,9 +51,13 @@ Server::handleReadyRead()
     //socket->write(QByteArray::fromHex("b8f1290c6201f501728000008091000018")); // -5.13
   } else if (request == dsc_brake) {
     qDebug() << "sending dsc brake response";
-    //socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dc228122acfe46fff8126f")); // 88.33
-    //socket->write(QByteArray::fromHex("b8f1290f61061800c6dcffa5ff65fe46000c126c")); // 0.0
-    socket->write(QByteArray::fromHex("b8f1290f6106ff00c5dc0336030bfe460004137c")); // 8.22
+    //socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dc228122acfe46fff8126f")); // brake 88.33
+    //socket->write(QByteArray::fromHex("b8f1290f61061800c6dcffa5ff65fe46000c126c")); // brake 0.0
+    //socket->write(QByteArray::fromHex("b8f1290f6106ff00c5dc0336030bfe460004137c")); // brake 8.22
+
+    //socket->write(QByteArray::fromHex("b8f1290f6106ff00c3dcffa5ff6533d501c3131f")); // brake 8.22 yaw 37.816 latg 0.45
+    socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dcffbaff65d296febb1322")); // brake 8.22 yaw -33.134 latg -0.325
+
   } else if (request == dsc_offsets) {
     qDebug() << "sending dsc offsets response";
     socket->write(QByteArray::fromHex("b8f1290c6102fb62f680fbc007640000b8"));
