@@ -42,21 +42,22 @@ Server::handleReadyRead()
   if (request == motronic_m3_throttle) {
     qDebug() << "sending motronic ecu response";
     //socket->write(QByteArray::fromHex("1227a0000003b600000000000069858b65073a7b8181a60008000440043303e803f603e8635c73")); // DKP 100 Throttle 3.95
-    socket->write(QByteArray::fromHex("1227a0000003b600000000000069858b65073a7c8181a600080001e201dd0223022f0223635ce0")); // DKP 54.7 Throttle 2.17
+    //socket->write(QByteArray::fromHex("1227a0000003b600000000000069858b65073a7c8181a600080001e201dd0223022f0223635ce0")); // DKP 54.7 Throttle 2.17
     //socket->write(QByteArray::fromHex("1227a0035d03660054043d00df66828b660a3a898181a6003600000000000000000000005d5b3a")); // RPM 861
     //socket->write(QByteArray::fromHex("1227a00ceb036600b1024d007966808c6a0e3a888181a600810000000000000100000000635c35")); // RPM 3307
+    socket->write(QByteArray::fromHex("1227a01fe7036606d1094d01e940848c5f2e3c888181a1087100043b043300d000c100d3505be7")); // RPM 8167
   } else if (request == dsc_steering) {
     qDebug() << "sending dsc steering wheel response";
     socket->write(QByteArray::fromHex("b8f1290c6201f5010110dd8180810000b7"));  // angle 184.365
     //socket->write(QByteArray::fromHex("b8f1290c6201f501728000008091000018")); // -5.13
   } else if (request == dsc_brake) {
     qDebug() << "sending dsc brake response";
-    //socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dc228122acfe46fff8126f")); // brake 88.33
+    socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dc228122acfe46fff8126f")); // brake 88.33
     //socket->write(QByteArray::fromHex("b8f1290f61061800c6dcffa5ff65fe46000c126c")); // brake 0.0
     //socket->write(QByteArray::fromHex("b8f1290f6106ff00c5dc0336030bfe460004137c")); // brake 8.22
 
     //socket->write(QByteArray::fromHex("b8f1290f6106ff00c3dcffa5ff6533d501c3131f")); // brake 8.22 yaw 37.816 latg 0.45
-    socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dcffbaff65d296febb1322")); // brake 8.22 yaw -33.134 latg -0.325
+    //socket->write(QByteArray::fromHex("b8f1290f6106ff00c4dcffbaff65d296febb1322")); // brake 8.22 yaw -33.134 latg -0.325
 
   } else if (request == dsc_offsets) {
     qDebug() << "sending dsc offsets response";
