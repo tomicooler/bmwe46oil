@@ -1,6 +1,7 @@
 #include "server.h"
 
 #include <QDebug>
+#include <QDateTime>
 
 Server::Server()
 {
@@ -45,7 +46,43 @@ Server::handleReadyRead()
     //socket->write(QByteArray::fromHex("1227a0000003b600000000000069858b65073a7c8181a600080001e201dd0223022f0223635ce0")); // DKP 54.7 Throttle 2.17
     //socket->write(QByteArray::fromHex("1227a0035d03660054043d00df66828b660a3a898181a6003600000000000000000000005d5b3a")); // RPM 861
     //socket->write(QByteArray::fromHex("1227a00ceb036600b1024d007966808c6a0e3a888181a600810000000000000100000000635c35")); // RPM 3307
-    socket->write(QByteArray::fromHex("1227a01fe7036606d1094d01e940848c5f2e3c888181a1087100043b043300d000c100d3505be7")); // RPM 8167
+    //socket->write(QByteArray::fromHex("1227a01fe7036606d1094d01e940848c5f2e3c888181a1087100043b043300d000c100d3505be7")); // RPM 8167
+
+    static int rpm = 0;
+    quint8 a = (double)rpm / 256;
+    quint8 b = std::max(0, (rpm - (a*256)));
+
+   // qDebug() << "rpm" << rpm << a << b << QString::number(a, 16) << QString::number(b, 16);
+
+    QByteArray data = QByteArray::fromHex("1227a0");
+    data += a;
+    data += b;
+    data += (quint8)0;
+    data += QByteArray::fromHex("6606d1094d01e940848c5f2e3c888181a1087100043b043300d000c100d3505b");
+
+    quint8 checksum = 0;
+    for (const auto d : data)
+    {
+      checksum ^= d;
+    }
+    data.append(checksum);
+
+    static qint64 last = QDateTime::currentMSecsSinceEpoch();
+
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+
+    if ((now-last) > 100)
+    qDebug() << (now-last);
+
+    last = now;
+
+   // qDebug() << "data" << data.toHex() << data.size();
+
+    socket->write(data);
+    rpm++;
+    if (rpm == 8500)
+      rpm = 0;
+
   } else if (request == dsc_steering) {
     qDebug() << "sending dsc steering wheel response";
     socket->write(QByteArray::fromHex("b8f1290c6201f5010110dd8180810000b7"));  // angle 184.365
@@ -66,4 +103,5 @@ Server::handleReadyRead()
   else {
     qDebug() << "nem irtam!";
   }
+  socket->flush();
 }
