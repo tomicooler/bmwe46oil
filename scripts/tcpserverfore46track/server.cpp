@@ -39,6 +39,7 @@ Server::handleReadyRead()
   static const QByteArray dsc_offsets = QByteArray::fromHex("b829f102210241");
 
   static const QByteArray motronic_m3_throttle = QByteArray::fromHex("12050b031f");
+  static const QByteArray motronic_m3_speed = QByteArray::fromHex("12050b130f");
 
   if (request == motronic_m3_throttle) {
     qDebug() << "sending motronic ecu response";
@@ -71,7 +72,7 @@ Server::handleReadyRead()
 
     qint64 now = QDateTime::currentMSecsSinceEpoch();
 
-    if ((now-last) > 100)
+    //if ((now-last) > 100)
     qDebug() << (now-last);
 
     last = now;
@@ -99,6 +100,8 @@ Server::handleReadyRead()
   } else if (request == dsc_offsets) {
     qDebug() << "sending dsc offsets response";
     socket->write(QByteArray::fromHex("b8f1290c6102fb62f680fbc007640000b8"));
+  } else if (request == motronic_m3_speed) {
+    socket->write(QByteArray::fromHex("125ea00037037000000f730f560f740f7f0f500f9e0f7a0f7a012a012a012a012a012a012a000000007f3c7f1881a200000000000200000000000000000000fb0500000000000000000000000a23127200007276011330000000000000dc")); // 55 km/h
   }
   else {
     qDebug() << "nem irtam!";
