@@ -13,6 +13,11 @@ pressure, just a switch.
 
 ![alt text](scripts/oilpics/1523787182.png?raw=true "INPA screenshot")
 
+<a href="https://play.google.com/store/apps/details?id=com.tomicooler.bmw.e46oil">Available on Google Play</a>
+
+I have made a new Real-Time Telemetry application for BMW E46 M3 owners, if you are interested check out that project
+on my <a href="https://github.com/tomicooler/E46Track">GitHub</a>.
+
 **How hard can it be?**
 
 ## General
