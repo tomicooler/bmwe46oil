@@ -3,43 +3,45 @@
 
 #include <QObject>
 #include <QTimer>
-#include <QList>
 
-#include <ds2request.h>
-#include <ds2parser.h>
-#include <dataextractor.h>
+#include "ds2message.h"
+#include "requester.h"
 
-class Facade : public QObject
-{
+class Facade : public QObject {
   Q_OBJECT
 
-  Q_PROPERTY(DS2Request *request READ request CONSTANT FINAL)
-  Q_PROPERTY(int updateInterval READ updateInterval WRITE setUpdateInterval NOTIFY updateIntervalChanged)
+  Q_PROPERTY(Model *model READ model CONSTANT)
+  Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
 
 public:
   explicit Facade(QObject *parent = nullptr);
 
-  DS2Request *request();
-
-  int updateInterval() const;
-  Q_INVOKABLE void start();
-  Q_INVOKABLE void stop();
+  Model *model();
+  int delay() const;
 
 signals:
   void sendData(const QByteArray &data);
-  void messageReceived(const DS2Message &message);
-  void updateIntervalChanged(int updateInterval);
+  void delayChanged(int delay);
 
 public slots:
+  void sendRequest();
   void dataReceived(const QByteArray &data);
-  void setUpdateInterval(int updateInterval);
-  void requestData();
+  void connected();
+  void responseTimeout();
+  void setDelay(int delay);
 
 private:
-  QTimer m_updateTimer;
-  DS2Parser m_parser;
-  DS2Request m_request;
-  QByteArray m_buffer;
+  void chooseNextRequester();
+
+private:
+  std::shared_ptr<Model> m_model;
+  QByteArray buffer;
+  DS2Parser parser;
+
+  Requester requester;
+  bool m_connected{false};
+  QTimer responeTimer;
+  int m_delay{};
 };
 
 #endif // FACADE_H

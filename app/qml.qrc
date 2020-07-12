@@ -1,30 +1,25 @@
 <RCC>
     <qresource prefix="/">
+        <file>main.qml</file>
+        <file>WiFiInterfaceForm.ui.qml</file>
+        <file>WiFiInterface.qml</file>
+        <file>SerialPortForm.ui.qml</file>
+        <file>SerialPort.qml</file>
+        <file>MainForm.ui.qml</file>
+        <file>InfoDialog.qml</file>
+        <file>DashboardForm.ui.qml</file>
+        <file>Dashboard.qml</file>
+        <file>+android/SerialPort.qml</file>
+        <file>+android/Store.qml</file>
+        <file>Store.qml</file>
+        <file>icons/appicon.png</file>
+        <file>icons/navigate_before-black-48dp.svg</file>
+        <file>icons/settings-black-48dp.svg</file>
+        <file>icons/thermometer-empty.svg</file>
+        <file>icons/thermometer-full.svg</file>
+        <file>icons/thermometer-half.svg</file>
+        <file>icons/thermometer-quarter.svg</file>
+        <file>icons/thermometer-three-quarters.svg</file>
         <file>qtquickcontrols2.conf</file>
-        <file>qml/actions/qmldir</file>
-        <file>qml/actions/ActionTypes.qml</file>
-        <file>qml/actions/AppActions.qml</file>
-        <file>qml/stores/MainStore.qml</file>
-        <file>qml/stores/qmldir</file>
-        <file>qml/views/DashboardForm.ui.qml</file>
-        <file>qml/views/SerialPortForm.ui.qml</file>
-        <file>qml/main.qml</file>
-        <file>qml/views/ConfigForm.ui.qml</file>
-        <file>qml/icons/thermometer-empty.svg</file>
-        <file>qml/icons/thermometer-full.svg</file>
-        <file>qml/icons/thermometer-half.svg</file>
-        <file>qml/icons/thermometer-quarter.svg</file>
-        <file>qml/icons/thermometer-three-quarters.svg</file>
-        <file>qml/views/Dashboard.qml</file>
-        <file>qml/views/Config.qml</file>
-        <file>qml/views/SerialPort.qml</file>
-        <file>qml/+android/main.qml</file>
-        <file>qml/stores/+android/MainStore.qml</file>
-        <file>qml/views/+android/SerialPort.qml</file>
-        <file>qml/views/WiFiInterface.qml</file>
-        <file>qml/views/WiFiInterfaceForm.ui.qml</file>
-        <file>qml/icons/arrow-left.svg</file>
-        <file>qml/icons/bars.svg</file>
-        <file>qml/views/Common.qml</file>
     </qresource>
 </RCC>
