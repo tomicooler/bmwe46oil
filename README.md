@@ -1,4 +1,4 @@
-# BMW E46 Oil
+# E46Oil
 
 Unfortunately non ///M3 models of the BMW E46 series does not have oil temperature gauge
 in the instrument cluster. On BMW forums a lot of guys ask for some way to see the

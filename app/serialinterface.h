@@ -4,8 +4,7 @@
 #include <QObject>
 #include <QSerialPort>
 
-class SerialInterface : public QObject
-{
+class SerialInterface : public QObject {
   Q_OBJECT
 
   Q_PROPERTY(QString port READ port WRITE setPort NOTIFY portChanged)
@@ -22,6 +21,7 @@ public:
   int baud() const;
 
 signals:
+  void connected();
   void dataReceived(const QByteArray &data);
   void portChanged(QString port);
   void baudChanged(int baud);
@@ -35,7 +35,6 @@ public slots:
 protected slots:
   void handleReadyRead();
   void handleError(QSerialPort::SerialPortError error);
-  void handleBytesWritten(qint64 written);
 
 private:
   QSerialPort m_serial;
